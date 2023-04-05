@@ -250,8 +250,7 @@ public class WebChromeClientHostApiImpl implements WebChromeClientHostApi {
     if (WebViewFlutterPlugin.activity==null||!FileUtil.checkSDcard(WebViewFlutterPlugin.activity)) {
       return;
     }
-    String[] selectPicTypeStr = {WebViewFlutterPlugin.activity.getString(R.string.take_photo),
-            WebViewFlutterPlugin.activity.getString(R.string.photo_library)};
+    String[] selectPicTypeStr = {WebViewFlutterPlugin.activity.getString(R.string.photo_library)};
     new AlertDialog.Builder(WebViewFlutterPlugin.activity, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
             .setOnCancelListener(new ReOnCancelListener())
             .setItems(selectPicTypeStr,
@@ -259,12 +258,8 @@ public class WebChromeClientHostApiImpl implements WebChromeClientHostApi {
                       @Override
                       public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
-                          // 相机拍摄
+                      
                           case 0:
-                            openCamera();
-                            break;
-                          // 手机相册
-                          case 1:
                             openImageChooserActivity();
                             break;
                           default:
@@ -295,41 +290,6 @@ public class WebChromeClientHostApiImpl implements WebChromeClientHostApi {
   /**
    * 打开照相机
    */
-  private static void openCamera() {
-    if (WebViewFlutterPlugin.activity == null) {
-      android.widget.Toast.makeText(application, "activity can not null", Toast.LENGTH_SHORT).show();
-      return;
-    }
-    if (hasPermissions(WebViewFlutterPlugin.activity, perms)) {
-      try {
-        //创建File对象，用于存储拍照后的照片
-        File outputImage = FileUtil.createImageFile(WebViewFlutterPlugin.activity);
-        if (outputImage.exists()) {
-          outputImage.delete();
-        }
-        outputImage.createNewFile();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-          cameraUri = FileProvider.getUriForFile(WebViewFlutterPlugin.activity, WebViewFlutterPlugin.activity.getPackageName() + ".fileprovider", outputImage);
-        } else {
-          Uri.fromFile(outputImage);
-        }
-        //启动相机程序
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraUri);
-        WebViewFlutterPlugin.activity.startActivityForResult(intent, REQUEST_CAMERA);
-      } catch (Exception e) {
-        Toast.makeText(application, e.getMessage(), Toast.LENGTH_SHORT).show();
-        if (uploadMessageAboveL != null) {
-          uploadMessageAboveL.onReceiveValue(null);
-          uploadMessageAboveL = null;
-        }
-      }
-    } else {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        ActivityCompat.requestPermissions(WebViewFlutterPlugin.activity, perms, REQUEST_CAMERA);
-      }
-    }
-  }
 
   /**
    * Check if the calling context has a set of permissions.
@@ -369,7 +329,7 @@ public class WebChromeClientHostApiImpl implements WebChromeClientHostApi {
   public boolean requestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
     if (requestCode == REQUEST_CAMERA) {
       if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-        openCamera();
+     
       } else {
         Toast.makeText(application, application.getString(R.string.take_pic_need_permission), Toast.LENGTH_SHORT).show();
         if (uploadMessage != null) {
